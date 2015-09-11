@@ -95,8 +95,16 @@ main(up,['-r']) :-  % recursively fetch all repositories
     shell("find . -name .git -type d | xargs -n1 -P4 -I% git --git-dir=% --work-tree=%/.. remote update -p").
 main(up,[]) :-
     inside_git_repository,
+    Upstream = 'origin/master',
+    patch_name_id(Upstream,Origin0),
     shell("git remote update -p origin"),
-    with_clean_tree(shell("git rebase origin/master")).
+    patch_name_id(Upstream,Origin),
+    ( Origin0 = Origin ->
+        true % no rebase necessary
+    ; otherwise ->
+        with_clean_tree(shellf("git rebase ~s",[Upstream]))
+    ).
+
 
 
 % present each hunk to the user, asking whether it
