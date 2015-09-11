@@ -111,26 +111,29 @@ temp_commit(Format, Args) :-
     shellf("git commit -m 'temp commit: ~s'", [Msg]).
 
 
-%% stash(-Id)
+%% stash
 %
-%  Stash all changes in the working tree and unify Id
-%  with the commit ID for the stash created.  If there
-%  are no changes to stash, unifies Id with 'none'.
-%  See also unstash/1
-stash(Id) :-
-    shell_line(git, [stash, create], Id),
-    !,
-    shell("git reset --hard &>/dev/null").
-stash(none).
+%  Stash away changes to the index and work tree so that they
+%  can be restored later.  This is similar in spirit to "git stash"
+%  but uses commits directly on the current branch.
+%
+%  This approach has the following benefits:
+%
+%    * stashed changes behave identically to user's other changes
+%    * easier for users to recover from errors (data in reflogs)
+%    * facilitates merge conflict resolution
+%
+%  See also unstash/0
+stash :-
+    shell("git commit --allow-empty -m 'tp stash: unsaved index'"),
+    shell("git commit --all --allow-empty -m 'tp stash: unsaved work tree'").
 
-%% unstash(?Id)
+%% unstash
 %
-%  Restores changes saved in stash with commit Id.
-%  If `var(Id)`, this is a noop.
-unstash(none) :-
-    !.
-unstash(Id) :-
-    shellf("git stash apply --quiet ~s", [Id]).
+%  Restores changes saved with stash/0.
+unstash :-
+    shell("git reset HEAD^"),
+    shell("git reset --soft HEAD^").
 
 
 %% with_clean_tree(+Goal)
@@ -139,7 +142,7 @@ unstash(Id) :-
 %  the tree are stashed and restored, regardless what happens
 %  in Goal.
 with_clean_tree(Goal) :-
-    setup_call_cleanup(stash(Id), Goal, unstash(Id)).
+    setup_call_cleanup(stash, Goal, unstash).
 
 
 %% on_temp_branch(+Basis,+Goal)
