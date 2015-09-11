@@ -19,6 +19,7 @@ main(help,_) :-
     writeln(" lg       view local patches"),
     writeln(" float    move a patch to the stack's top"),
     writeln(" push     publish patches"),
+    writeln(" rebase   interactive rebase"),
     writeln(" reword   edit a patch message"),
     writeln(" save     store current changes in a patch"),
     writeln(" sink     move a patch to the stack's bottom"),
@@ -45,6 +46,8 @@ main(push,[]) :-
     inside_git_repository,
     git_current_branch(Branch),
     exec(git(push,'--tags',origin,Branch)).
+main(rebase,[]) :-
+    exec(git(rebase,'--interactive','--autostash','origin/master')).
 main(reword,[]) :-
     inside_git_repository,
     with_clean_tree(shell("git commit --amend")).
