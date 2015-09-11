@@ -49,8 +49,7 @@ main(push,[]) :-
 main(rebase,[]) :-
     exec(git(rebase,'--interactive','--autostash','origin/master')).
 main(reword,[]) :-
-    inside_git_repository,
-    with_clean_tree(shell("git commit --amend")).
+    main(reword,['HEAD']).
 main(reword,[PatchName]) :-
     inside_git_repository,
     patch_name_id(PatchName,Target),
