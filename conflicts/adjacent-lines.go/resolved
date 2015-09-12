@@ -1,0 +1,20 @@
+package market
+
+import (
+	"net/http"
+
+	"vgpc/entity"
+
+	"github.com/mndrix/aeds"
+)
+
+func PublishOffer(w http.ResponseWriter, r *http.Request) {
+	// create a new listing
+	if r.Method == "POST" && r.FormValue("command") == "edit" {
+		// stuff to modify existing offer
+		// err := entity.EditExistingOffer()
+	} else if r.Method == "POST" {
+		newOffer, err := entity.NewOfferByRequest(r)
+		_, err = aeds.Put(c, newOffer)
+	}
+}

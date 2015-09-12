@@ -1,0 +1,28 @@
+package market
+
+import (
+	"net/http"
+
+	"vgpc/entity"
+
+	"github.com/mndrix/aeds"
+)
+
+func PublishOffer(w http.ResponseWriter, r *http.Request) {
+	// create a new listing
+<<<<<<< HEAD
+	if r.Method == "POST" && r.FormValue("command") == "edit" {
+		// stuff to modify existing offer
+		// err := entity.EditExistingOffer()
+	} else if r.Method == "POST" {
+		newOffer, err := entity.NewOfferByRequest(r, row)
+||||||| parent of 892e666... NewOfferByRequest: remove 'row' argument
+	if r.Method == "POST" {
+		newOffer, err := entity.NewOfferByRequest(r, row)
+=======
+	if r.Method == "POST" {
+		newOffer, err := entity.NewOfferByRequest(r)
+>>>>>>> 892e666... NewOfferByRequest: remove 'row' argument
+		_, err = aeds.Put(c, newOffer)
+	}
+}
