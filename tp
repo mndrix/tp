@@ -330,4 +330,4 @@ rebase_action(fixup,PatchId) :-
     shellf("git cherry-pick --no-commit ~s", [PatchId]),
     shell("git commit --amend --no-edit").
 rebase_action(pick,PatchId) :-
-    shellf("git cherry-pick ~s", [PatchId]).
+    shellf("git cherry-pick --allow-empty ~s", [PatchId]).
