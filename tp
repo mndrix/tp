@@ -39,8 +39,8 @@ main(float,[TargetName]) :-
     patch_name_id(TargetName, Target),
     rebase(
         Target,
-        [pick-Target, Rest...],
-        [Rest..., pick-Target]
+        [pick-Target, Rest..., pick-Index, pick-Worktree],
+        [Rest..., pick-Target, pick-Index, pick-Worktree]
     ).
 main(push,[]) :-
     inside_git_repository,
