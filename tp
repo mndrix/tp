@@ -102,7 +102,7 @@ main(up,[]) :-
     ( Origin0 = Origin ->
         true % no rebase necessary
     ; otherwise ->
-        with_clean_tree(shellf("git rebase ~s",[Upstream]))
+        with_clean_tree(shellf("git rebase --keep-empty ~s",[Upstream]))
     ).
 
 
