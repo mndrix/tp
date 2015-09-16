@@ -72,8 +72,8 @@ main(save,['to', PatchName]) :-
     temp_commit("save to ~s", [PatchName]),
     rebase(
         Target,
-        [ pick-Target, Others..., pick-Changes ],
-        [ pick-Target, fixup-Changes, Others... ]
+        [ pick-Target, Others..., pick-Changes, pick-Index, pick-Worktree ],
+        [ pick-Target, fixup-Changes, Others..., pick-Index, pick-Worktree ]
     ).
 main(save,[]) :-
     inside_git_repository,
