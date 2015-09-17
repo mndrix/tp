@@ -27,7 +27,7 @@ main(help,_) :-
     writeln(" up       update patches based on upstream changes").
 main(di,[]) :-
     inside_git_repository,
-    exec(git(diff,'--minimal','--color=auto','--break-rewrites','--find-renames','--find-copies','--no-prefix')).
+    exec(git(diff,'--minimal','--color=auto','--find-renames','--find-copies','--no-prefix')).
 main(discard,[]) :-
     inside_git_repository,
     exec(git(checkout,'-p')).
