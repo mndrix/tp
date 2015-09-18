@@ -1,7 +1,9 @@
+:- use_module(library(clpfd)).
 :- use_module(library(list_util), [split/3]).
 :- use_module(library(readutil),[read_file_to_codes/3]).
 
 :- use_module(diff,[]).
+:- use_module(patch,[]).
 
 main([File]) :-
     read_file_to_codes(File,Text,[]),
@@ -146,8 +148,8 @@ resolve(
     split(RightCodes,0'\n,RightLines),
 
     % calculate patches which caused each side to diverge from origin
-    once(diff:diff(OriginLines,LeftLines,LeftPatches)),
-    once(diff:diff(OriginLines,RightLines,RightPatches)),
+    once(diff(OriginLines,LeftLines,LeftPatches)),
+    once(diff(OriginLines,RightLines,RightPatches)),
 
     format("diff origin left~n"),
     format("~p", [LeftPatches]),
@@ -160,6 +162,23 @@ resolve(
     ; otherwise ->
         throw(could_not_merge_patches(LeftPatches,RightPatches))
     ).
+
+
+diff(Base,Head,Patches) :-
+    diff:diff(Base,Head,Patches0),
+    calculate_lines(Patches0,1,Patches).
+
+% calculate line numbers to convert between patches from the 'diff' library
+% and patches from the 'patch' library.
+calculate_lines([],_,[]).
+calculate_lines([add(X)|Patches0],N0,[add_line(N0,X)|Patches]) :-
+    N #= N0 + 1,
+    calculate_lines(Patches0,N,Patches).
+calculate_lines([context(_)|Patches0],N0,Patches) :-
+    N #= N0 + 1,
+    calculate_lines(Patches0,N,Patches).
+calculate_lines([delete(X)|Patches0],N,[rm_line(N,X)|Patches]) :-
+    calculate_lines(Patches0,N,Patches).
 
 
 merge(_Left,_Right,_Merged) :-

@@ -9,6 +9,21 @@ error:has_type(patch, Patch) :-
     is_patch(Patch).
 
 
+:- multifile user:portray/1.
+user:portray([Patch|Patches]) :-
+    maplist(is_patch,[Patch|Patches]),
+    !,
+    maplist(user:portray,[Patch|Patches]).
+user:portray(add_line(N,X)) :-
+    format("+~@ ~s~n", [portray_index(3,N),X]).
+user:portray(rm_line(N,X)) :-
+    format("-~@ ~s~n", [portray_index(3,N),X]).
+
+
+portray_index(Width,N) :-
+    format("~|~t~d~*+", [N,Width]).
+
+
 %% is_patch(+Patch) is semidet.
 %
 %  True if Patch is a valid patch term.

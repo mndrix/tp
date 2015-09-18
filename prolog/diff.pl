@@ -1,4 +1,4 @@
-:- module(diff, [diff/3]).
+:- module(diff, [diff/3,is_patch/1]).
 
 :- use_module(library(lcs),[lcs/3]).
 
