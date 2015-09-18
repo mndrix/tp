@@ -17,10 +17,10 @@ error:has_type(patch, Patch) :-
 %  alphabetically by functor name.
 is_patch(add_line(N,Text)) :-
     integer(N),
-    error:is_of_type(list(codes),Text).
+    error:is_of_type(codes,Text).
 is_patch(rm_line(N,Text)) :-
     integer(N),
-    error:is_of_type(list(codes),Text).
+    error:is_of_type(codes,Text).
 
 
 %% inverse(+A:patch, -Ainv:patch) is det.
