@@ -88,7 +88,7 @@ commute(add_line(M0,TextA),rm_line(N0,TextB),rm_line(N,TextB),add_line(M,TextA))
     ).
 commute(rm_line(M0,TextA),add_line(N0,TextB),add_line(N,TextB),rm_line(M,TextA)) :-
     ( M0#<N0, M#=M0,   N#=N0+1
-    ; M0#=N0, M#=M0,   N#=N0+1
+    ; M0#=N0, M#=M0+1, N#=N0
     ; M0#>N0, M#=M0+1, N#=N0
     ).
 commute(rm_line(M0,TextA),rm_line(N0,TextB),rm_line(N,TextB),rm_line(M,TextA)) :-
