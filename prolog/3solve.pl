@@ -2,9 +2,10 @@
 
 main([File]) :-
     read_file_to_codes(File,Text,[]),
-    phrase(file(Hunks),Text),
-    maplist(portray,Hunks),
-    ( has_a_conflict(Hunks) -> halt(1); halt(0) ).
+    phrase(file(Conflicted),Text),
+    maplist(resolve,Conflicted,Resolved),
+    maplist(portray,Resolved),
+    ( has_a_conflict(Resolved) -> halt(1); halt(0) ).
 
 file([Chunk|Chunks]) -->
     chunk(Chunk),
@@ -129,3 +130,11 @@ rest_of_line([C|Cs],Tail) -->
     \+ end_of_line,
     [C],
     rest_of_line(Cs,Tail).
+
+
+resolve(agree(Text),agree(Text)).
+resolve(
+    conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes),
+    conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)
+) :-
+    true.
