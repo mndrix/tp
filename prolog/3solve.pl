@@ -157,8 +157,9 @@ resolve(
     format("~p", [RightPatches]),
 
     % do patch algebra merge between the two diff lists
-    ( merge(LeftPatches,RightPatches,_MergedPatches) ->
-        true
+    ( merge(LeftPatches,RightPatches,MergedPatches) ->
+        format("merge left origin right~n"),
+        format("~p", [MergedPatches])
     ; otherwise ->
         throw(could_not_merge_patches(LeftPatches,RightPatches))
     ).
@@ -181,5 +182,10 @@ calculate_lines([delete(X)|Patches0],N,[rm_line(N,X)|Patches]) :-
     calculate_lines(Patches0,N,Patches).
 
 
-merge(_Left,_Right,_Merged) :-
+% do patch algebra to merge patches together
+merge(Left,Right,Merged) :-
+    maplist(patch:inverse,Right,RightInv),
+    reverse(RightInv,RightInvReversed),
+    append(Right,RightInvReversed,RightNoop),
+    append(RightNoop,Left,Merged),
     true.
