@@ -1,4 +1,3 @@
-#!/usr/bin/env pl
 % don't call use_module here. rely on autoloading
 
 % syntactic sugar for describing rebase lists
