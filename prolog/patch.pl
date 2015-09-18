@@ -13,7 +13,8 @@ error:has_type(patch, Patch) :-
 user:portray([Patch|Patches]) :-
     maplist(is_patch,[Patch|Patches]),
     !,
-    maplist(user:portray,[Patch|Patches]).
+    reverse([Patch|Patches],ExecutionOrder), % from git- to execution-order
+    maplist(user:portray,ExecutionOrder).
 user:portray(add_line(N,X)) :-
     format("+~@ ~s~n", [portray_index(3,N),X]).
 user:portray(rm_line(N,X)) :-

@@ -167,7 +167,11 @@ resolve(
 
 diff(Base,Head,Patches) :-
     diff:diff(Base,Head,Patches0),
-    calculate_lines(Patches0,1,Patches).
+    calculate_lines(Patches0,1,ExecutionOrder),
+
+    % convert from execution order (a then b then c) into git order
+    % (c follows b follows a)
+    reverse(ExecutionOrder,Patches).
 
 % calculate line numbers to convert between patches from the 'diff' library
 % and patches from the 'patch' library.
@@ -186,6 +190,6 @@ calculate_lines([delete(X)|Patches0],N,[rm_line(N,X)|Patches]) :-
 merge(Left,Right,Merged) :-
     maplist(patch:inverse,Right,RightInv),
     reverse(RightInv,RightInvReversed),
-    append(Right,RightInvReversed,RightNoop),
-    append(RightNoop,Left,Merged),
+    append(RightInvReversed,Right,RightNoop),
+    append(Left,RightNoop,Merged),
     true.
