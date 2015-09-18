@@ -3,14 +3,22 @@
 main([File]) :-
     read_file_to_codes(File,Text,[]),
     phrase(file(Hunks),Text),
-    writeq(Hunks),
-    nl.
+    maplist(portray,Hunks).
 
 file([Chunk|Chunks]) -->
     chunk(Chunk),
     file(Chunks).
 file([]) -->
     [].
+
+:- multifile portray/1.
+portray(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)) :-
+    format("<<<<<<< ~s~s", [LeftLabel,LeftCodes]),
+    format("||||||| ~s~s", [OriginLabel,OriginCodes]),
+    format("=======~n~s",[RightCodes]),
+    format(">>>>>>> ~s", [RightLabel]).
+portray(agree(Text)) :-
+    write(Text).
 
 
 chunk(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)) -->
