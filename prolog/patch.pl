@@ -1,4 +1,4 @@
-:- module(patch, [commute/4, inverse/2, is_patch/1]).
+:- module(patch, [commute/4,float/3,inverse/2,is_patch/1]).
 
 :- use_module(library(clpfd)).
 :- use_module(library(error)).
@@ -138,3 +138,15 @@ listing  of all combinations is the most succinct way to go (or just the easiest
 to verify).
 
 */
+
+
+%% float(+N:integer,+Patches0:list(patch),-Patches:list(patch))
+%
+%  True if the patch in position N of Patches0 can be commuted to the head form
+%  Patches.
+float(1,Patches,Patches).
+float(N0,[PatchA0|Patches0],[PatchB1,PatchA1|Patches]) :-
+    N0 #> 1,
+    N #= N0 - 1,
+    float(N,Patches0,[PatchB0|Patches]),
+    commute(PatchB0,PatchA0,PatchA1,PatchB1).

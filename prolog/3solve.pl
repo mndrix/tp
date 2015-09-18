@@ -191,5 +191,17 @@ merge(Left,Right,Merged) :-
     maplist(patch:inverse,Right,RightInv),
     reverse(RightInv,RightInvReversed),
     append(RightInvReversed,Right,RightNoop),
-    append(Left,RightNoop,Merged),
-    true.
+    append(Left,RightNoop,Merged0),
+
+    % remove the inverse patches by commuting them off the tip
+    length(Right,RightSize),
+    length(Left,LeftSize),
+    remove_inverse_patches(RightSize,LeftSize,Merged0,Merged).
+
+% commute inverse patches to the tip then drop them
+remove_inverse_patches(0,_,Merged,Merged).
+remove_inverse_patches(N0,LeftSize,Merged0,Merged) :-
+    InversePatchIndex is LeftSize + 1,
+    patch:float(InversePatchIndex,Merged0,[_|Merged1]),
+    N is N0 - 1,
+    remove_inverse_patches(N,LeftSize,Merged1,Merged).
