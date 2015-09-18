@@ -53,6 +53,10 @@ conflict_marker -->
     end_conflict(_).
 
 
+nl -->
+    nl(_,_).
+
+
 nl([LineFeed|Tail],Tail) -->
     { LineFeed = 0'\n },
     [LineFeed].
@@ -63,7 +67,7 @@ nl([CarriageReturn,LineFeed|Tail],Tail) -->
 
 
 eol -->
-    nl(_,_).
+    nl.
 eol -->
     eos.
 
@@ -83,7 +87,7 @@ start_conflict_origin(Label) -->
 
 start_conflict_right -->
     "=======",
-    nl(_,_).
+    nl.
 
 
 end_conflict(Label) -->
