@@ -1,7 +1,7 @@
 :- use_module(library(list_util), [split/3]).
 :- use_module(library(readutil),[read_file_to_codes/3]).
 
-:- use_module(diff,[diff/3]).
+:- use_module(diff,[]).
 
 main([File]) :-
     read_file_to_codes(File,Text,[]),
@@ -146,8 +146,8 @@ resolve(
     split(RightCodes,0'\n,RightLines),
 
     % calculate patches which caused each side to diverge from origin
-    once(diff(OriginLines,LeftLines,LeftPatches)),
-    once(diff(OriginLines,RightLines,RightPatches)),
+    once(diff:diff(OriginLines,LeftLines,LeftPatches)),
+    once(diff:diff(OriginLines,RightLines,RightPatches)),
 
     format("diff origin left~n"),
     format("~p", [LeftPatches]),
