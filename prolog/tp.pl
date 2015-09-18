@@ -152,6 +152,7 @@ unstash :-
 %  Runs goal with a clean Git working tree.  Any changes in
 %  the tree are stashed and restored, regardless what happens
 %  in Goal.
+:- meta_predicate with_clean_tree(0).
 with_clean_tree(Goal) :-
     setup_call_cleanup(stash, Goal, unstash).
 
@@ -160,6 +161,7 @@ with_clean_tree(Goal) :-
 %
 %  Perform Goal on a temporary branch based on Basis.
 %  When finished, swap the temporary branch into place
+:- meta_predicate on_temp_branch(+,0).
 on_temp_branch(Basis,Goal) :-
     setup_call_catcher_cleanup(
         on_temp_branch_setup(Basis,Original,Tmp),
