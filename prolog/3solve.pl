@@ -3,7 +3,8 @@
 main([File]) :-
     read_file_to_codes(File,Text,[]),
     phrase(file(Hunks),Text),
-    maplist(portray,Hunks).
+    maplist(portray,Hunks),
+    ( has_a_conflict(Hunks) -> halt(1); halt(0) ).
 
 file([Chunk|Chunks]) -->
     chunk(Chunk),
@@ -19,6 +20,10 @@ portray(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCod
     format(">>>>>>> ~s", [RightLabel]).
 portray(agree(Text)) :-
     write(Text).
+
+
+has_a_conflict(Hunks) :-
+    memberchk(conflict(_,_,_,_,_,_),Hunks).
 
 
 chunk(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)) -->
