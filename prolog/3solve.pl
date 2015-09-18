@@ -66,13 +66,13 @@ nl([CarriageReturn,LineFeed|Tail],Tail) -->
     [CarriageReturn,LineFeed].
 
 
-eol -->
+end_of_line -->
     nl.
-eol -->
-    eos.
+end_of_line -->
+    end_of_stream.
 
 
-eos([],[]).
+end_of_stream([],[]).
 
 
 start_conflict_left(Label) -->
@@ -96,7 +96,7 @@ end_conflict(Label) -->
 
 
 conflict_label("") -->
-    eol.
+    end_of_line.
 conflict_label(Label) -->
     " ",
     rest_of_line(Codes, []),
@@ -107,10 +107,10 @@ conflict_label(Label) -->
 %
 % Captures the rest of a line, including the end of line marker.
 rest_of_line(Tail,Tail) -->
-    eos.
+    end_of_stream.
 rest_of_line(Tail0,Tail) -->
     nl(Tail0,Tail).
 rest_of_line([C|Cs],Tail) -->
-    \+ eol,
+    \+ end_of_line,
     [C],
     rest_of_line(Cs,Tail).
