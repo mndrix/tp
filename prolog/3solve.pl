@@ -1,7 +1,8 @@
 main([File]) :-
     read_file_to_codes(File,Text,[]),
     phrase(file(Hunks),Text),
-    writeq(Hunks).
+    writeq(Hunks),
+    nl.
 
 file([Chunk|Chunks]) -->
     chunk(Chunk),
