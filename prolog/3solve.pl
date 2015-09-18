@@ -52,12 +52,17 @@ conflict_marker -->
     end_conflict(_).
 
 
-nl -->
-    "\n".
+nl([LineFeed|Tail],Tail) -->
+    { LineFeed = 0'\n },
+    [LineFeed].
+nl([CarriageReturn,LineFeed|Tail],Tail) -->
+    { CarriageReturn = 0'\r },
+    { LineFeed = 0'\n },
+    [CarriageReturn,LineFeed].
 
 
 eol -->
-    nl.
+    nl(_,_).
 eol -->
     eos.
 
@@ -77,7 +82,7 @@ start_conflict_origin(Label) -->
 
 start_conflict_right -->
     "=======",
-    nl.
+    nl(_,_).
 
 
 end_conflict(Label) -->
@@ -95,10 +100,11 @@ conflict_label(Label) -->
 
 %% rest_of_line(?Line:codes, ?Tail:codes)
 %
-% Captures the rest of a line.  It consumes the trailing newline
-% but does not include it in Line.
+% Captures the rest of a line, including the end of line marker.
 rest_of_line(Tail,Tail) -->
-    eol.
+    eos.
+rest_of_line(Tail0,Tail) -->
+    nl(Tail0,Tail).
 rest_of_line([C|Cs],Tail) -->
     \+ eol,
     [C],
