@@ -1,3 +1,5 @@
+:- use_module(library(readutil),[read_file_to_codes/3]).
+
 main([File]) :-
     read_file_to_codes(File,Text,[]),
     phrase(file(Hunks),Text),

@@ -1,4 +1,8 @@
-% don't call use_module here. rely on autoloading
+:- use_module(library(ansi_term), [ansi_format/3]).
+:- use_module(library(process), [process_create/3]).
+:- use_module(library(random),[random_between/3]).
+:- use_module(library(unix),[exec/1]).
+:- use_module(library(readutil), [read_line_to_codes/2]).
 
 % syntactic sugar for describing rebase lists
 :- op(990,yf,(...)).
@@ -203,7 +207,6 @@ shellf(Pattern,Args) :-
 % prompt the user for each untracked file, asking whether he wants
 % to start tracking it.
 prompt_for_untracked_files :-
-    use_module(library(ansi_term), [ansi_format/3]),
     untracked_files(Files),
     prompt_for_untracked_files(Files).
 
