@@ -1,5 +1,24 @@
 :- module(diff, [diff/3]).
 
+:- use_module(library(lcs),[lcs/3]).
+
+is_patch(add(_)).
+is_patch(context(_)).
+is_patch(delete(_)).
+
+:- multifile user:portray/1.
+user:portray([Patch|Patches]) :-
+    maplist(is_patch,[Patch|Patches]),
+    !,
+    maplist(user:portray,[Patch|Patches]).
+user:portray(add(X)) :-
+    format("+~s~n", [X]).
+user:portray(context(X)) :-
+    format(" ~s~n", [X]).
+user:portray(delete(X)) :-
+    format("-~s~n", [X]).
+
+
 diff(Old,New,Diff) :-
     nonvar(Old),
     nonvar(New),

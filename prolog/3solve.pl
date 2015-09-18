@@ -1,4 +1,7 @@
+:- use_module(library(list_util), [split/3]).
 :- use_module(library(readutil),[read_file_to_codes/3]).
+
+:- use_module(diff,[diff/3]).
 
 main([File]) :-
     read_file_to_codes(File,Text,[]),
@@ -137,4 +140,27 @@ resolve(
     conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes),
     conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)
 ) :-
+    % split conflicted content into lines
+    split(OriginCodes,0'\n,OriginLines),
+    split(LeftCodes,0'\n,LeftLines),
+    split(RightCodes,0'\n,RightLines),
+
+    % calculate patches which caused each side to diverge from origin
+    once(diff(OriginLines,LeftLines,LeftPatches)),
+    once(diff(OriginLines,RightLines,RightPatches)),
+
+    format("diff origin left~n"),
+    format("~p", [LeftPatches]),
+    format("diff origin right~n"),
+    format("~p", [RightPatches]),
+
+    % do patch algebra merge between the two diff lists
+    ( merge(LeftPatches,RightPatches,_MergedPatches) ->
+        true
+    ; otherwise ->
+        throw(could_not_merge_patches(LeftPatches,RightPatches))
+    ).
+
+
+merge(_Left,_Right,_Merged) :-
     true.
