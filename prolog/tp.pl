@@ -95,7 +95,7 @@ main(st,[]) :-
     exec(git(status,'--short','--untracked-files')).
 main(up,['-r']) :-  % recursively fetch all repositories
     !,
-    shell("find . -name .git -type d | xargs -n1 -P4 -I% git --git-dir=% --work-tree=%/.. remote update -p").
+    shell("find . -name .git -type d | xargs -n1 -P3 -I% git --git-dir=% --work-tree=%/.. remote update -p").
 main(up,[]) :-
     inside_git_repository,
     shell("git remote update -p origin"),
