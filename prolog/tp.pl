@@ -283,13 +283,16 @@ portray(child(Parent)) :-
 %  text editor.  Pattern describes a modified list of actions that is
 %  executed.
 rebase(First,Pattern0,Pattern) :-
-    with_clean_tree(rebase_(First,Pattern0,Pattern)).
+    rebase(First,parent(First),Pattern0,Pattern).
 
-rebase_(First,Pattern0,Pattern) :-
+rebase(First,Onto,Pattern0,Pattern) :-
+    with_clean_tree(rebase_(First,Onto,Pattern0,Pattern)).
+
+rebase_(First,Onto,Pattern0,Pattern) :-
     rebase_todo(First,Actions0),
     once(phrase(rebase_pattern(Pattern0),Actions0)),
     once(phrase(rebase_pattern(Pattern),Actions)),
-    on_temp_branch(parent(First),rebase_execute(Actions)).
+    on_temp_branch(Onto,rebase_execute(Actions)).
 
 
 %% rebase_todo(+Target, -Actions:list(pair))
