@@ -1,4 +1,4 @@
-:- module(threesolve, [main/1,resolve_file/2,resolve_file/3]).
+:- module(threesolve, [main/1,resolve_file/3]).
 
 :- use_module(library(clpfd)).
 :- use_module(library(list_util), [split/3]).
@@ -7,7 +7,9 @@
 :- use_module(patch,[]).
 
 main([File]) :-
-    resolve_file(File, Status),
+    tmp_file('3solve-',Tmp),
+    resolve_file(File, Tmp, Status),
+    rename_file(Tmp,File),
     ( Status = resolved -> halt(0); halt(1) ).
 
 resolve_file(File,Status) :-
