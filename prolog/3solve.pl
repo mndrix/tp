@@ -138,8 +138,8 @@ rest_of_line([C|Cs],Tail) -->
 
 resolve(agree(Text),agree(Text)).
 resolve(
-    conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes),
-    conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)
+    conflict(_,LeftCodes,_,OriginCodes,_,RightCodes),
+    agree(MergedText)
 ) :-
     % split conflicted content into lines
     split(OriginCodes,0'\n,OriginLines),
@@ -150,15 +150,20 @@ resolve(
     once(diff(OriginLines,LeftLines,LeftPatches)),
     once(diff(OriginLines,RightLines,RightPatches)),
 
-    format("diff origin left~n"),
-    format("~p", [LeftPatches]),
-    format("diff origin right~n"),
-    format("~p", [RightPatches]),
+    % format("diff origin left~n"),
+    % format("~p", [LeftPatches]),
+    % format("diff origin right~n"),
+    % format("~p", [RightPatches]),
 
     % do patch algebra merge between the two diff lists
     ( merge(LeftPatches,RightPatches,MergedPatches) ->
-        format("merge left origin right~n"),
-        format("~p", [MergedPatches])
+        % format("merge left origin right~n"),
+        % format("~p", [MergedPatches]),
+        patch:canonical_order(MergedPatches,CanonicalPatches),
+        reverse(CanonicalPatches,ExecutionOrder),
+        patch:diff(OriginLines,MergedLines,ExecutionOrder),
+        split(MergedCodes,0'\n,MergedLines),
+        string_codes(MergedText,MergedCodes)
     ; otherwise ->
         throw(could_not_merge_patches(LeftPatches,RightPatches))
     ).
