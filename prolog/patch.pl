@@ -2,6 +2,9 @@
 
 :- use_module(library(clpfd)).
 :- use_module(library(error)).
+:- use_module(library(lcs),[]).
+
+:- use_module(diff,[]).
 
 % uncomment when tracing through clpfd-heavy code
 %:- initialization(set_prolog_flag(clpfd_goal_expansion, false)).
@@ -237,3 +240,37 @@ This requirement forces us to use something like bubble sort.  Fortunately,
 patches are usually close to sorted when we start so we rarely encounter the
 full O(N^2) run time.
 */
+
+
+%% diff(?Old:list,?New:list,?Diff:list(patch))
+%
+%  True if patches in Diff applied to the content in Old produces the content in
+%  New.  This can be used to calculate the diff between two lists.  It can also
+%  be used to apply (or unapply) a diff to some original (or subsequent)
+%  content.
+%
+%  This is similar to diff:diff/3 but omits only generates patches for which
+%  patch:is_patch/1 is true.
+diff(Old,New,Diff) :-
+    nonvar(Old),
+    nonvar(New),
+    !,
+    lcs:lcs(Old,New,Lcs),
+    diff_(Lcs,Old,New,1,Diff).
+diff(Old,New,Diff) :-
+    nonvar(Diff),
+    ( nonvar(Old); nonvar(New) ),
+    !,
+    diff_(_Lcs,Old,New,1,Diff).
+
+diff_([X|Lcs],[X|Old],[X|New],I0,Diff) :-
+    I #= I0 + 1,
+    diff_(Lcs,Old,New,I,Diff).
+diff_(Lcs,[O|Old],New,I,[rm_line(I,O)|Diff]) :-
+    diff:dif_head(Lcs,[O|Old]),
+    diff_(Lcs,Old,New,I,Diff).
+diff_(Lcs,Old,[N|New],I0,[add_line(I0,N)|Diff]) :-
+    I #= I0 + 1,
+    diff:dif_head(Lcs,[N|New]),
+    diff_(Lcs,Old,New,I,Diff).
+diff_([],[],[],_I,[]).
