@@ -4,6 +4,8 @@
 :- use_module(library(unix),[exec/1]).
 :- use_module(library(readutil), [read_line_to_codes/2]).
 
+:- use_module('3solve.pl', []).
+
 % syntactic sugar for describing rebase lists
 :- op(990,yf,(...)).
 
@@ -196,14 +198,25 @@ patch_name_id(Name,Id) :-
     shell_line(git, ['rev-parse',Name], Id).
 
 
+git_changed_files(Files) :-
+    shell_lines(git,[diff, '--name-only'], Files0),
+    maplist(string_codes,Files1,Files0),
+    sort(Files1,Files).  % remove duplicates
+
+
 git_current_branch(Branch) :-
     shell_line(git, ['rev-parse','--abbrev-ref','HEAD'], Branch).
 
 
 % like shell/1 but supports format/1 patterns
 shellf(Pattern,Args) :-
+    shellf(Pattern,Args,0).
+
+
+% like shell/2 but supports format/1 patterns
+shellf(Pattern,Args,Status) :-
     format(string(Command),Pattern,Args),
-    shell(Command).
+    shell(Command,Status).
 
 
 % prompt the user for each untracked file, asking whether he wants
@@ -337,4 +350,58 @@ rebase_action(fixup,PatchId) :-
     shellf("git cherry-pick --no-commit ~s", [PatchId]),
     shell("git commit --amend --no-edit").
 rebase_action(pick,PatchId) :-
-    shellf("git cherry-pick --allow-empty ~s", [PatchId]).
+    cherry_pick(PatchId).
+
+
+cherry_pick(PatchId) :-
+    shellf("git cherry-pick --allow-empty ~s", [PatchId], Status),
+    cherry_pick_check_git_status(Status).
+
+cherry_pick_check_git_status(0).
+cherry_pick_check_git_status(1) :-
+    resolve_conflicts(Status),
+    cherry_pick_check_3solve_status(Status).
+
+cherry_pick_check_3solve_status(resolved) :-
+    Name = 'GIT_EDITOR',
+
+    % which editor does the user prefer?
+    ( getenv(Name,Val) ->
+        OldValue=just(Val)
+    ; otherwise ->
+        OldValue=nothing
+    ),
+
+    % commit with a noop editor, then restore user's real preference
+    setup_call_cleanup(
+        setenv(Name,'/usr/bin/true'),  % noop editor
+        shell("git cherry-pick --continue"),
+        (OldValue=just(Val) -> setenv(Name,Val); unsetenv(Name) )
+    ).
+cherry_pick_check_3solve_status(conflicted) :-
+    % TODO suspend our process
+    % TODO let user resolve conflict
+    % TODO user does 'fg' to resume
+    % TODO verify all files are resolved
+    % TODO commit as with ResolveStatus=resolved
+    fail.
+
+
+resolve_conflicts(Status) :-
+    git_changed_files(Files),
+    resolve_conflicts(Files,Status).
+
+resolve_conflicts([],resolved).
+resolve_conflicts([File|Files],FinalStatus) :-
+    tmp_file('tp-',Tmp),
+    threesolve:resolve_file(File, Tmp, ResolveStatus),
+    rename_file(Tmp,File),
+    ( ResolveStatus=resolved ->
+        format(user_error,"good - 3solve resolved ~s~n",[File]),
+        shellf("git add ~s", [File]),
+        resolve_conflicts(Files,FinalStatus)
+    ; ResolveStatus=conflicted ->
+        format(user_error,"bad - 3solve failed on ~s~n",[File]),
+        FinalStatus=conflicted,
+        resolve_conflicts(Files,_)
+    ).
