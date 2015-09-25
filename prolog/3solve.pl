@@ -150,15 +150,8 @@ resolve(
     once(diff(OriginLines,LeftLines,LeftPatches)),
     once(diff(OriginLines,RightLines,RightPatches)),
 
-    % format("diff origin left~n"),
-    % format("~p", [LeftPatches]),
-    % format("diff origin right~n"),
-    % format("~p", [RightPatches]),
-
     % do patch algebra merge between the two diff lists
     ( merge(LeftPatches,RightPatches,MergedPatches) ->
-        % format("merge left origin right~n"),
-        % format("~p", [MergedPatches]),
         patch:canonical_order(MergedPatches,CanonicalPatches),
         reverse(CanonicalPatches,ExecutionOrder),
         patch:diff(OriginLines,MergedLines,ExecutionOrder),
