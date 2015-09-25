@@ -3,6 +3,8 @@
 :- use_module(library(clpfd)).
 :- use_module(library(error)).
 
+% uncomment when tracing through clpfd-heavy code
+%:- initialization(set_prolog_flag(clpfd_goal_expansion, false)).
 
 :- multifile error:has_type/2.
 error:has_type(patch, Patch) :-
