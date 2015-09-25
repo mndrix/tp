@@ -1,5 +1,8 @@
 all: bin/tp bin/3solve
 
+test:
+	prove -e '' -r t
+
 bin/tp: prolog/tp-main.pl prolog/tp.pl
 	swipl -q -t main -o bin/tp -c prolog/tp-main.pl
 
