@@ -1,3 +1,5 @@
+:- module(threesolve, [main/1,resolve_file/2,resolve_file/3]).
+
 :- use_module(library(clpfd)).
 :- use_module(library(list_util), [split/3]).
 :- use_module(library(readutil),[read_file_to_codes/3]).
@@ -5,11 +7,22 @@
 :- use_module(patch,[]).
 
 main([File]) :-
+    resolve_file(File, Status),
+    ( Status = resolved -> halt(0); halt(1) ).
+
+resolve_file(File,Status) :-
     read_file_to_codes(File,Text,[]),
     phrase(file(Conflicted),Text),
     maplist(resolve,Conflicted,Resolved),
     maplist(portray,Resolved),
-    ( has_a_conflict(Resolved) -> halt(1); halt(0) ).
+    ( has_a_conflict(Resolved) -> Status=conflicted; Status=resolved ).
+
+resolve_file(In,Out,Status) :-
+    setup_call_cleanup(
+        open(Out,write,Stream),
+        with_output_to(Stream,resolve_file(In,Status)),
+        close(Stream)
+    ).
 
 file([Chunk|Chunks]) -->
     chunk(Chunk),

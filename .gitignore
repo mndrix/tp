@@ -1,3 +1,4 @@
 *~
 bin/3solve
 bin/tp
+conflicts/*/*.got
