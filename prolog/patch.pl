@@ -13,9 +13,11 @@ error:has_type(patch, Patch) :-
 
 :- multifile user:portray/1.
 user:portray([Patch|Patches]) :-
-    maplist(is_patch,[Patch|Patches]),
+    GitOrder = [Patch|Patches],
+    maplist(is_patch,GitOrder),
     !,
-    reverse([Patch|Patches],ExecutionOrder), % from git- to execution-order
+    canonical_order(GitOrder,CanonicalOrder),
+    reverse(CanonicalOrder,ExecutionOrder),
     maplist(user:portray,ExecutionOrder).
 user:portray(add_line(N,X)) :-
     ground(N),
@@ -43,6 +45,19 @@ is_patch(add_line(N,Text)) :-
 is_patch(rm_line(N,Text)) :-
     integer(N),
     error:is_of_type(codes,Text).
+
+
+%% line(?Patch:patch,?Line:positive_integer) is det.
+%
+%   True if Line is the line number whose content is changed by Patch.
+line(add_line(N,_),N).
+line(rm_line(N,_),N).
+
+
+%% removes_content(+Patch:patch) is semidet.
+%
+%  True if Patch only removes content from the document to which it applies.
+removes_content(rm_line(_,_)).
 
 
 %% inverse(+A:patch, -Ainv:patch) is det.
@@ -156,3 +171,69 @@ float(N0,[PatchA0|Patches0],[PatchB1,PatchA1|Patches]) :-
     N #= N0 - 1,
     float(N,Patches0,[PatchB0|Patches]),
     commute(PatchB0,PatchA0,PatchA1,PatchB1).
+
+
+%% less(+A:patch,+B:patch) is semidet.
+%
+%   True if patch A should appear before patch B in a standard diff output.
+%   Namely, smaller line numbers appear before larger ones.  On the same line,
+%   content removal comes first.
+less(A,B) :-
+    line(A,LineA),
+    line(B,LineB),
+    LineA #< LineB.
+less(A,B) :-
+    line(A,Line),
+    line(B,Line),
+    removes_content(A).
+
+
+%% canonical_order(+Patches0:list(patch), -Patches:list(patch)) is det.
+%
+%  True if Patches0 sorts into the canonical order given by Patches. This
+%  predicate only sorts as much as possible.  Sometimes two patches want to
+%  commute but can't.  In that case, they only migrate as close to their ideal
+%  position as possible.
+%
+%  Patches0 and Patches are both in git order.  Any patches which cancel out one
+%  another will be dropped.
+canonical_order(Patches0,Patches) :-  % See Note_sort
+    bubble(Patches0,Patches1),
+    ( Patches0 = Patches1 ->
+        % bubbling patches made no progress. we're done
+        Patches = Patches1
+    ; otherwise ->
+        canonical_order(Patches1,Patches)
+    ).
+
+% bubble(A,B) is det.
+bubble([],[]).
+bubble([X],[X]) :-
+    !.  % optimization. nothing below matches a single element list
+bubble([X0,Y0|Rest0],Rest) :-
+    inverse(Y0,X0),  % patches cancel out
+    !,               % force "\+ inverse(Y0,X0)" below
+    bubble(Rest0,Rest).
+bubble([X0,Y0|Rest0],[X0|Rest]) :-
+    less(Y0,X0),     % already proper order, leave it alone
+    !,
+    bubble([Y0|Rest0],Rest).
+bubble([X0,Y0|Rest0],[Y1|Rest]) :-
+    commute(Y0,X0,X1,Y1), % always succeeds since "\+ inverse(Y0,X0)"
+    less(X1,Y1),          % commute made things more sorted
+    !,                    % force "\+ less(X1,Y1)" below
+    bubble([X1|Rest0],Rest).
+bubble([X0,Y0|Rest0],[X0|Rest]) :-
+    bubble([Y0|Rest0],Rest).
+
+/*
+Note_sort:
+
+The sort algorithm used in canonical_order/2 must only swap adjacent elements in
+the list. Patch commute is the only operation we have for changing position of
+two patches and it only operates on adjacent patches.
+
+This requirement forces us to use something like bubble sort.  Fortunately,
+patches are usually close to sorted when we start so we rarely encounter the
+full O(N^2) run time.
+*/
