@@ -19,6 +19,12 @@ user:portray(delete(X)) :-
     format("-~s~n", [X]).
 
 
+%% diff(?Old:list,?New:list,?Diff:list(patch))
+%
+%  True if patches in Diff applied to the content in Old produces the content in
+%  New.  This can be used to calculate the diff between two lists.  It can also
+%  be used to apply (or unapply) a diff to some original (or subsequent)
+%  content.
 diff(Old,New,Diff) :-
     nonvar(Old),
     nonvar(New),
@@ -42,6 +48,10 @@ diff_(Lcs,Old,[N|New],[add(N)|Diff]) :-
 diff_([],[],[],[]).
 
 
+%% dif_head(?A:list, ?B:list) is semidet.
+%
+%  True if A and B have different head elements.  An empty list is considered
+%  to have a head which is differrent from all other elements.
 dif_head([],[_|_]).
 dif_head([X|_],[Y|_]) :-
     dif(X,Y).
