@@ -1,14 +1,24 @@
 #!/usr/bin/env swipl -q -t main -f
 :- use_module('prolog/3solve.pl').
 
+term_expansion(generate_tests, Tests) :-
+    expand_file_name('conflicts/*',Dirs),
+    maplist(generate_test,Dirs,Tests).
+
+generate_test(Dir,Test) :-
+    atom_concat('conflicts/',Name,Dir),
+    format(atom(Conflicted),'~s/conflicted',[Dir]),
+    format(atom(Resolved),'~s/resolved',[Dir]),
+    format(atom(ResolvedGot),'~s/resolved.got',[Dir]),
+    format(atom(Diff),"diff -q ~s ~s >/dev/null",[Resolved,ResolvedGot]),
+    Test = (
+        Name :-
+            resolve_file(Conflicted,ResolvedGot,_),
+            shell(Diff,Status),
+            Status == 0
+    ),
+    tap:register_test(Name).
+
 :- use_module(library(tap)).
 
-'adjacent-lines.go' :-
-    resolve_file('conflicts/adjacent-lines.go/conflicted', 'conflicts/adjacent-lines.go/resolved.got', _),
-    shell("diff -q conflicts/adjacent-lines.go/resolved conflicts/adjacent-lines.go/resolved.got >/dev/null",Status),
-    Status == 0.
-
-'multiple-conflicts.go' :-
-    resolve_file('conflicts/multiple-conflicts.go/conflicted', 'conflicts/multiple-conflicts.go/resolved.got', _),
-    shell("diff -q conflicts/multiple-conflicts.go/resolved conflicts/multiple-conflicts.go/resolved.got >/dev/null",Status),
-    Status == 0.
+generate_tests.
