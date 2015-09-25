@@ -107,7 +107,12 @@ main(up,[]) :-
     ( Origin=MergeBase ->
         true % no rebase necessary
     ; otherwise ->
-        with_clean_tree(shellf("git rebase --keep-empty ~s",[Upstream]))
+        rebase(
+            child(MergeBase),
+            Upstream,
+            [A...],
+            [A...]
+        )
     ).
 
 
