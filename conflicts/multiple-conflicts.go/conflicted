@@ -1,0 +1,40 @@
+package market
+
+import (
+	"net/http"
+
+	"appengine"
+)
+
+func Offer(w http.ResponseWriter, r *http.Request) {
+	ctx := HtmlPage(w, r)
+
+	// generate status boolean for use in template
+	switch offer.Status {
+	case "sold":
+<<<<<<< HEAD
+		ctx["Sold"] = true
+		// get buyer's address info
+||||||| parent of 8253b2a... Use Offer methods to check status
+		ctx["Sold"] = true
+		// get buyer's info
+=======
+		// get buyer's info
+>>>>>>> 8253b2a... Use Offer methods to check status
+		buyer := offer.Buyer(c)
+		ctx["Buyer"] = buyer
+<<<<<<< HEAD
+		// get buyer's user info for rating
+		buyingUser := offer.BuyingUser(c)
+		ctx["BuyingUser"] = buyingUser
+	case "no-sale":
+		ctx["NoSale"] = true
+||||||| parent of 8253b2a... Use Offer methods to check status
+	case "no-sale":
+		ctx["NoSale"] = true
+=======
+>>>>>>> 8253b2a... Use Offer methods to check status
+	}
+
+	ExecuteWithWrapper(w, "offer.html", ctx)
+}

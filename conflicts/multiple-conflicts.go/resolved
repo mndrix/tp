@@ -1,0 +1,24 @@
+package market
+
+import (
+	"net/http"
+
+	"appengine"
+)
+
+func Offer(w http.ResponseWriter, r *http.Request) {
+	ctx := HtmlPage(w, r)
+
+	// generate status boolean for use in template
+	switch offer.Status {
+	case "sold":
+		// get buyer's address info
+		buyer := offer.Buyer(c)
+		ctx["Buyer"] = buyer
+		// get buyer's user info for rating
+		buyingUser := offer.BuyingUser(c)
+		ctx["BuyingUser"] = buyingUser
+	}
+
+	ExecuteWithWrapper(w, "offer.html", ctx)
+}
