@@ -1,0 +1,15 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main () {
+<<<<<<< TREE
+    printf("hello\n");
+    printf("bye\n");
+||||||| BASE-REVISION
+    printf("hi\n");
+    printf("bye\n");
+=======
+    printf("hi\n");
+    printf("goodbye\n");
+>>>>>>> MERGE-SOURCE
+    exit(0);
+}
