@@ -2,7 +2,6 @@
 :- use_module(library(list_util), [split/3]).
 :- use_module(library(readutil),[read_file_to_codes/3]).
 
-:- use_module(diff,[]).
 :- use_module(patch,[]).
 
 main([File]) :-
@@ -165,26 +164,9 @@ resolve(
     ).
 
 
-diff(Base,Head,Patches) :-
-    diff:diff(Base,Head,Patches0),
-    calculate_lines(Patches0,1,ExecutionOrder),
-
-    % convert from execution order (a then b then c) into git order
-    % (c follows b follows a)
-    reverse(ExecutionOrder,Patches).
-
-% calculate line numbers to convert between patches from the 'diff' library
-% and patches from the 'patch' library.
-calculate_lines([],_,[]).
-calculate_lines([add(X)|Patches0],N0,[add_line(N0,X)|Patches]) :-
-    N #= N0 + 1,
-    calculate_lines(Patches0,N,Patches).
-calculate_lines([context(_)|Patches0],N0,Patches) :-
-    N #= N0 + 1,
-    calculate_lines(Patches0,N,Patches).
-calculate_lines([delete(X)|Patches0],N,[rm_line(N,X)|Patches]) :-
-    calculate_lines(Patches0,N,Patches).
-
+diff(Base,Head,GitOrder) :-
+    patch:diff(Base,Head,ExecutionOrder),
+    reverse(ExecutionOrder,GitOrder).
 
 % do patch algebra to merge patches together
 merge(Left,Right,Merged) :-
