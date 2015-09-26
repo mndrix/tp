@@ -83,7 +83,7 @@ inverse_(add_line(N,Text),rm_line(N,Text)).
 %% commute(?A0:patch, ?B0:patch, +B1:patch, +A1:patch) is det.
 %
 %  True if the change induced by the patch series A0 then B0
-%  is the same as the change induced by the patche series B1 then A1.
+%  is the same as the change induced by the patch series B1 then A1.
 %
 %  In the clauses below, we use the following naming conventions:
 %
@@ -164,8 +164,8 @@ to verify).
 
 %% float(+N:integer,+Patches0:list(patch),-Patches:list(patch))
 %
-%  True if the patch in position N of Patches0 can be commuted to the head form
-%  Patches.
+%  True if the patch in position N of Patches0 can be commuted to the head to
+%  form Patches.
 float(1,Patches,Patches).
 float(N0,[PatchA0|Patches0],[PatchB1,PatchA1|Patches]) :-
     N0 #> 1,
