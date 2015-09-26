@@ -278,14 +278,14 @@ read_lines(Out,Lines) :-
 
 
 % rules for displaying Git commit references
-:- dynamic portray/1.
-portray(parent(child(Id))) :-
+:- multifile user:portray/1.
+user:portray(parent(child(Id))) :-
     !,
     once( portray(Id); write(Id) ).
-portray(parent(Id)) :-
+user:portray(parent(Id)) :-
     once( portray(Id); write(Id) ),
     write("^").
-portray(child(Parent)) :-
+user:portray(child(Parent)) :-
     format(string(Range),"~w..", [Parent]),
     shell_lines(git,[log,'--pretty=format:%H','--reverse',Range],Lines),
     ( Lines = [Child|_] ->

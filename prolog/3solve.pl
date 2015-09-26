@@ -32,13 +32,13 @@ file([Chunk|Chunks]) -->
 file([]) -->
     [].
 
-:- multifile portray/1.
-portray(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)) :-
+:- multifile user:portray/1.
+user:portray(conflict(LeftLabel,LeftCodes,OriginLabel,OriginCodes,RightLabel,RightCodes)) :-
     format("<<<<<<< ~s~s", [LeftLabel,LeftCodes]),
     format("||||||| ~s~s", [OriginLabel,OriginCodes]),
     format("=======~n~s",[RightCodes]),
     format(">>>>>>> ~s", [RightLabel]).
-portray(agree(Text)) :-
+user:portray(agree(Text)) :-
     write(Text).
 
 
