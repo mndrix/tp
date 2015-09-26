@@ -50,7 +50,7 @@ is_patch(rm_line(N,Text)) :-
 
 %% line(?Patch:patch,?Line:positive_integer) is det.
 %
-%   True if Line is the line number whose content is changed by Patch.
+%  True if Line is the line number whose content is changed by Patch.
 line(add_line(N,_),N).
 line(rm_line(N,_),N).
 
