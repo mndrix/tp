@@ -41,10 +41,10 @@ portray_index(Width,N) :-
 %  When adding clauses to this predicate, please keep them sorted
 %  alphabetically by functor name.
 is_patch(add_line(N,Text)) :-
-    integer(N),
+    error:positive_integer(N),
     error:is_of_type(codes,Text).
 is_patch(rm_line(N,Text)) :-
-    integer(N),
+    error:positive_integer(N),
     error:is_of_type(codes,Text).
 
 
