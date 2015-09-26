@@ -1,3 +1,6 @@
 #!/usr/bin/env pl
 
-:- ['../prolog/tp'].
+:- use_module(tp, []).
+
+main(Args) :-
+    tp:main(Args).

@@ -1,3 +1,6 @@
 #!/usr/bin/env pl
 
-:- ['../prolog/3solve'].
+:- use_module('3solve', []).
+
+main(Args) :-
+    threesolve:main(Args).
