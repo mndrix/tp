@@ -4,8 +4,6 @@
 :- use_module(library(error)).
 :- use_module(library(lcs),[]).
 
-:- use_module(diff,[]).
-
 % uncomment when tracing through clpfd-heavy code
 %:- initialization(set_prolog_flag(clpfd_goal_expansion, false)).
 
@@ -267,10 +265,19 @@ diff_([X|Lcs],[X|Old],[X|New],I0,Diff) :-
     I #= I0 + 1,
     diff_(Lcs,Old,New,I,Diff).
 diff_(Lcs,[O|Old],New,I,[rm_line(I,O)|Diff]) :-
-    diff:dif_head(Lcs,[O|Old]),
+    dif_head(Lcs,[O|Old]),
     diff_(Lcs,Old,New,I,Diff).
 diff_(Lcs,Old,[N|New],I0,[add_line(I0,N)|Diff]) :-
     I #= I0 + 1,
-    diff:dif_head(Lcs,[N|New]),
+    dif_head(Lcs,[N|New]),
     diff_(Lcs,Old,New,I,Diff).
 diff_([],[],[],_I,[]).
+
+%% dif_head(?A:list, ?B:list) is semidet.
+%
+%  True if A and B have different head elements.  An empty list is considered
+%  to have a head which is differrent from all other elements.
+dif_head([],[_|_]).
+dif_head([X|_],[Y|_]) :-
+    dif(X,Y).
+%dif_head([_|_],[]).  % never called with empty 2nd argument
