@@ -1,3 +1,5 @@
+:- module(tp,[main/1]).
+
 :- use_module(library(ansi_term), [ansi_format/3]).
 :- use_module(library(process), [process_create/3]).
 :- use_module(library(random),[random_between/3]).
