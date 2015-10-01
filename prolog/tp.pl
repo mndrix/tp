@@ -31,6 +31,7 @@ main(help,_) :-
     writeln(" save     store current changes in a patch"),
     writeln(" sink     move a patch to the stack's bottom"),
     writeln(" st       summarize unsaved changes"),
+    writeln(" unsave   convert a patch into unsaved worktree changes"),
     writeln(" up       update patches based on upstream changes").
 main(di,[]) :-
     inside_git_repository,
@@ -97,6 +98,18 @@ main(sink,[TargetName]) :-
 main(st,[]) :-
     inside_git_repository,
     exec(git(status,'--short','--untracked-files')).
+main(unsave,[]) :-
+    !,
+    % can't just "git reset HEAD^" because that changes the index
+    main(unsave,['HEAD']).
+main(unsave,[TargetName]) :-
+    inside_git_repository,
+    patch_name_id(TargetName,Target),
+    rebase(
+        Target,
+        [ pick-Target, Others..., pick-Index, pick-Worktree ],
+        [ Others..., pick-Index, pick-Worktree, fixup-Target ]
+    ).
 main(up,['-r']) :-  % recursively fetch all repositories
     !,
     shell("find . -name .git -type d | xargs -n1 -P3 -I% git --git-dir=% --work-tree=%/.. remote update -p").
