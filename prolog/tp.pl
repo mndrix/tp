@@ -28,6 +28,7 @@ main(help,_) :-
     writeln(" push     publish patches"),
     writeln(" rebase   interactive rebase"),
     writeln(" reword   edit a patch message"),
+    writeln(" rm       throw away a patch"),
     writeln(" save     store current changes in a patch"),
     writeln(" sink     move a patch to the stack's bottom"),
     writeln(" st       summarize unsaved changes"),
@@ -66,6 +67,17 @@ main(reword,[PatchName]) :-
         Target,
         [pick-Target, Rest...],
         [edit(Edit)-Target, Rest...]
+    ).
+main(rm,[]) :-
+    !,
+    main(rm,['HEAD']).
+main(rm,[TargetName]) :-
+    inside_git_repository,
+    patch_name_id(TargetName,Target),
+    rebase(
+        Target,
+        [ pick-Target, Others... ],
+        [ Others... ]
     ).
 main(save,[to]) :-
     !,
